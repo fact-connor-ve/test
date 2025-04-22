@@ -1,0 +1,4614 @@
+openapi: 3.0.3
+info:
+  title: Factivity Connect 
+  version: '0.0.1'
+  description: > 
+    Factivity Connect provides a set of APIs designed to manage and interact with various operational
+    data points such as alarms, codes, customers, employees, machines, and orders. This system serves
+    as a centralized platform to enable seamless communication between different production modules,
+    offering real-time insights, job monitoring, and more.
+servers:
+  - url: http://localhost:9010/OpenEye/web/api
+    description: Root of Factivity Connect
+paths:
+  # /:
+  #   get:
+  #     summary: Root endpoint
+  #     description: >
+  #       This is a placeholder root endpoint. It currently returns a 501 status code
+  #       to indicate that no functionality has been implemented here.
+  #     responses:
+  #       '501':
+  #         description: Not Implemented – This endpoint is a placeholder and performs no action.
+  /ping:
+    get:
+      tags:
+        - System
+      summary: Ping Server for status
+      description: This endpoint is used to verify that the API server is alive and operational.
+      responses:
+        '200':
+          description: Server is alive
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ping:
+                    type: boolean
+                    example: true
+  # /basetest:
+  #   get:
+  #     tags:
+  #       - System
+  #     summary: Development Get Endpoint
+  #     description: >
+  #       This is endpoint is purely used for developers to test GET functions within Factivity Connect.
+  #     responses:
+  #       '200':
+  #         description: Successful response
+  #   post:
+  #     tags:
+  #       - System
+  #     summary: Development POST Endpoint
+  #     description: >
+  #       This is endpoint is purely used for developers to test POST functions within Factivity Connect.
+  #     responses:
+  #       '200':
+  #         description: Successful response
+  /endpoints:
+    get:
+      summary: Gets a list of all available API endpoints
+      description: Returns metadata about each endpoint exposed by the API, including the URI, HTTP method, and full URL.
+      tags:
+        - System
+      responses:
+        '200':
+          description: List of available API endpoints
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  api:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        version:
+                          type: string
+                          example: "1.0.0"
+                        catalog:
+                          type: string
+                          nullable: true
+                          example: null
+                        operations:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              uri:
+                                type: string
+                                example: "/alarm/job"
+                              method:
+                                type: string
+                                example: "PUT"
+                              name:
+                                type: string
+                                example: ""
+                              url:
+                                type: string
+                                example: "http://localhost:9010/OpenEye/web/api/endpoints/api/alarm/job"
+  /alarm/job:
+    put:
+      summary: Creates an alarm for a specific job
+      tags:
+        - Alarms
+      description: >
+        Registers an alarm tied to a specific job within Factivity MES.
+        The alarm is linked to an order, operation, employee, and station, with
+        optional miscellaneous fields for additional context.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                station_id:
+                  type: string
+                  description: Identifier for the reporting station
+                ord_id:
+                  type: string
+                  description: Order number the alarm is associated with
+                opr_no:
+                  type: integer
+                  description: Operation sequence number
+                emp_id:
+                  type: string
+                  description: Identifier for the employee creating the alarm
+                alarmName:
+                  type: string
+                  description: Name of the alarm
+                alarmDateTime:
+                  type: string
+                  format: date-time
+                  description: Date and time the alarm event occurred
+                action_prg:
+                  type: string
+                  description: Program or action associated with the alarm
+                misc1:
+                  type: string
+                  description: Custom metadata field 1
+                misc2:
+                  type: string
+                  description: Custom metadata field 2
+                misc3:
+                  type: string
+                  description: Custom metadata field 3
+      responses:
+        '200':
+          description: Alarm created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  job_alarm_created:
+                    type: object
+                    properties:
+                      alarm_name:
+                        type: string
+                      act_event_dt:
+                        type: string
+                        format: date
+                      act_event_tm:
+                        type: integer
+                      opr_seq_no:
+                        type: integer
+                      ord_id:
+                        type: string
+                      emp_id:
+                        type: string
+                      station_id:
+                        type: string
+                      task_id:
+                        type: string
+                      misc_data1:
+                        type: string
+                      misc_data2:
+                        type: string
+                      misc_data3:
+                        type: string
+                      is_actv:
+                        type: boolean
+                  transaction:
+                    type: object
+                    properties:
+                      complete:
+                        type: boolean
+                        description: Indicates if the transaction was successfully completed
+                      details:
+                        type: string
+                        description: Additional details about the result of the transaction
+  /alarm/task:
+    put:
+      summary: Creates an alarm for a specific task
+      tags:
+        - Alarms
+      description: >
+        Registers an alarm tied to a specific task within Factivity MES. This alarm is associated
+        with an order, operation, employee, station, and task ID. Additional miscellaneous fields may be included
+        to further define the context of the alarm.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                station_id:
+                  type: string
+                  description: Identifier for the reporting station
+                ord_id:
+                  type: string
+                  description: Order number the alarm is associated with
+                opr_no:
+                  type: integer
+                  description: Operation sequence number
+                emp_id:
+                  type: string
+                  description: Identifier for the employee creating the alarm
+                task_id:
+                  type: string
+                  description: Task ID the alarm is associated with
+                alarmName:
+                  type: string
+                  description: Name of the alarm
+                alarmDateTime:
+                  type: string
+                  format: date-time
+                  description: Date and time the alarm event occurred
+                action_prg:
+                  type: string
+                  description: Program or action associated with the alarm
+                misc1:
+                  type: string
+                  description: Custom metadata field 1
+                misc2:
+                  type: string
+                  description: Custom metadata field 2
+                misc3:
+                  type: string
+                  description: Custom metadata field 3
+      responses:
+        '200':
+          description: Alarm created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  task_alarm_created:
+                    type: object
+                    properties:
+                      alarm_name:
+                        type: string
+                      act_event_dt:
+                        type: string
+                        format: date
+                      act_event_tm:
+                        type: integer
+                      opr_seq_no:
+                        type: integer
+                      ord_id:
+                        type: string
+                      emp_id:
+                        type: string
+                      station_id:
+                        type: string
+                      task_id:
+                        type: string
+                      misc_data1:
+                        type: string
+                      misc_data2:
+                        type: string
+                      misc_data3:
+                        type: string
+                      is_actv:
+                        type: boolean
+                  transaction:
+                    type: object
+                    properties:
+                      complete:
+                        type: boolean
+                        description: Indicates if the transaction was successfully completed
+                      details:
+                        type: string
+                        description: Additional details about the result of the transaction
+  /codes/scrap:
+    get:
+      summary: Retrieves scrap codes
+      tags:
+        - Codes
+      description: >
+        Returns a list of available scrap codes used for tracking waste or rejected materials.
+        Optionally, the list can be filtered by a specific station using the `station_id` query parameter.
+      parameters:
+        - name: station_id
+          in: query
+          description: Filter the scrap codes by station
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of scrap codes
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  scrap_codes:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: Unique identifier of the scrap code
+                          example: "DS"
+                        desc:
+                          type: string
+                          description: Description of the scrap code
+                          example: "DAMAGED IN SHIPMENT"
+  /codes/setup:
+    get:
+      summary: Retrieves setup codes
+      tags:
+        - Codes
+      description: >
+        Returns a list of setup codes used to classify setup activities at a station.
+        You can optionally filter results using the `station_id` query parameter.
+      parameters:
+        - name: station_id
+          in: query
+          description: Filter setup codes by station
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of setup codes
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  setup_codes:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: Unique identifier of the setup code
+                          example: "CNC"
+                        desc:
+                          type: string
+                          description: Description of the setup code
+                          example: "Setup CNC fixture"
+  /codes/problem:
+    get:
+      summary: Retrieves problem codes
+      tags:
+        - Codes
+      description: >
+        Returns a list of problem codes used to indicate the reason that work on an operation has been temporarily interrupted.
+        These codes help categorize downtime reasons. The list can be optionally filtered by station using the `station_id` query parameter.
+      parameters:
+        - name: station_id
+          in: query
+          description: Filter problem codes by station
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of problem codes
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  problem_codes:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: Unique identifier for the problem code
+                          example: "Eng"
+                        desc:
+                          type: string
+                          description: Description of the problem
+                          example: "Waiting on Eng"
+  /customers:
+    get:
+      summary: Retrieves customer list
+      tags:
+        - Customers
+      description: >
+        Returns a list of customers with basic contact and location information.
+        You can optionally filter the list by a specific customer ID using the `id` query parameter.
+      parameters:
+        - name: id
+          in: query
+          description: Filter customers by customer ID
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of customers
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  customer_list:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        customer_id:
+                          type: string
+                          description: Unique identifier of the customer
+                          example: "109132"
+                        full_name:
+                          type: string
+                          description: Full customer name
+                          example: "ANA TRADING CO. LTD"
+                        addr1:
+                          type: string
+                          description: Address line 1
+                        addr2:
+                          type: string
+                          description: Address line 2
+                        addr3:
+                          type: string
+                          description: Address line 3
+                        state:
+                          type: string
+                          description: State or province
+                        city:
+                          type: string
+                          description: City name
+                        zip:
+                          type: string
+                          description: ZIP or postal code
+                        voice_phone:
+                          type: string
+                          description: Customer phone number
+                        country:
+                          type: string
+                          description: Country
+                          example: "USA"
+  /customers/purchaseorders:
+    get:
+      summary: Retrieves customer purchase orders
+      tags:
+        - Customers
+      description: >
+        Returns a list of purchase orders associated with a specific customer.
+        The `id` query parameter is required and represents the unique customer ID.
+      parameters:
+        - name: id
+          in: query
+          description: Customer ID used to retrieve associated purchase orders
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of customer purchase orders
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  customer_po_list:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        carrier_id:
+                          type: string
+                          description: Carrier ID
+                        state:
+                          type: string
+                          description: State or province
+                        city:
+                          type: string
+                          description: City
+                        zip:
+                          type: string
+                          description: ZIP or postal code
+                        voice_phone:
+                          type: string
+                          description: Contact phone number
+                        country:
+                          type: string
+                          description: Country
+                          example: "USA"
+                        customer_id:
+                          type: string
+                          description: Customer ID associated with the PO
+                          example: "116982"
+                        po_number:
+                          type: string
+                          description: Purchase order number
+                          example: "RV190260"
+                        drop_addr1:
+                          type: string
+                          description: Drop ship address line 1
+                        drop_addr2:
+                          type: string
+                          description: Drop ship address line 2
+                        drop_addr3:
+                          type: string
+                          description: Drop ship address line 3
+                        drop_addr4:
+                          type: string
+                          description: Drop ship address line 4
+                        drop_addr5:
+                          type: string
+                          description: Drop ship address line 5
+                        create_dt:
+                          type: string
+                          format: date
+                          description: Date the purchase order was created
+                        cust_req_dt:
+                          type: string
+                          format: date
+                          description: Customer requested delivery date
+  /departments:
+    get:
+      summary: Retrieves department list
+      tags:
+        - Departments
+      description: >
+        Returns a list of departments in the system. You can optionally filter the results
+        by providing a department ID using the `id` query parameter.
+      parameters:
+        - name: id
+          in: query
+          description: Filter departments by department ID
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of departments
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  departments:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        department_id:
+                          type: string
+                          description: Unique identifier of the department
+                          example: "9215"
+                        department_desc:
+                          type: string
+                          description: Description or name of the department
+                          example: "Paint Department"
+                        department_location:
+                          type: string
+                          description: Physical location or area for the department
+                        cal_id:
+                          type: string
+                          description: Calendar ID associated with the department
+                        plt_id:
+                          type: string
+                          description: Plant ID associated with the department
+  /dev-lists:
+    get:
+      summary: Retrieves Dev-Lists
+      tags:
+        - Lists
+      description: Retrieves device list information based on the required function and optional list ID.
+      parameters:
+        - name: func
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Function ID used to filter device lists
+        - name: id
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Optional list ID to further filter the results
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  dev_lists:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        list_func:
+                          type: string
+                          description: Function ID
+                        list_id:
+                          type: string
+                          description: Device list ID
+                        list_desc:
+                          type: string
+                          description: Description of the device list
+  /employees:
+    get:
+      summary: Retrieves employee list
+      tags:
+        - Employees
+      description: >
+        Returns a list of employees including their ID, full name, assigned shift, and department.
+        You can optionally filter the list by employee ID using the `id` query parameter.
+      parameters:
+        - name: id
+          in: query
+          description: Filter employees by employee ID
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of employees
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  employees:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        emp_id:
+                          type: string
+                          description: Unique identifier for the employee
+                          example: "00001"
+                        full_name:
+                          type: string
+                          description: Full name of the employee
+                          example: "JOHN SMITH"
+                        schd_shift_id:
+                          type: integer
+                          description: Scheduled shift ID
+                          example: 1
+                        dept_id:
+                          type: string
+                          description: Department ID the employee belongs to
+  /employees/image:
+    get:
+      summary: Retrieves the specified employees image
+      tags:
+        - Employees
+      description: >
+        Retrieves the locally stored image associated with a specific employee.
+        The image can either be stored in a database BLOB or as a file path, depending on its category.
+      parameters:
+        - name: emp_id
+          in: query
+          required: true
+          description: The ID of the employee whose image is being requested
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful image retrieval
+          content:
+            image/png:
+              schema:
+                type: string
+                format: binary
+  /employees/clock:
+    get:
+      summary: Retrieves employees currently on the clock
+      tags:
+        - Employees
+      description: >
+        Returns a list of employees who are currently clocked in. You can optionally filter the results
+        by providing a `station_id` to narrow the list to a specific reporting station.
+      parameters:
+        - name: station_id
+          in: query
+          description: Filter employees by reporting station
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of employees on the clock
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  employees_on_clock:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        emp_id:
+                          type: string
+                          description: Employee ID
+                          example: "00001"
+                        start_datetime:
+                          type: string
+                          format: date-time
+                          description: Timestamp of when the employee clocked in
+                          example: "2025-04-04T02:52:56.000"
+                        station_id:
+                          type: string
+                          description: Reporting station
+                          example: "All"
+                        act_prod_dt:
+                          type: string
+                          format: date
+                          description: Active production date
+                          example: "2025-04-04"
+                        rpt_shift_id:
+                          type: integer
+                          description: Reported shift ID
+                          example: 3
+
+    put:
+      summary: Clock employee in or out
+      tags:
+        - Employees
+      description: >
+        Updates the clock status of an employee at a given station. The action flag determines
+        whether the employee is clocking in (`true`) or clocking out (`false`).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - emp_id
+                - station_id
+                - action
+              properties:
+                emp_id:
+                  type: string
+                  description: Employee ID
+                station_id:
+                  type: string
+                  description: Station ID
+                action:
+                  type: boolean
+                  description: >
+                    `true` for clock in, `false` for clock out
+      responses:
+        '200':
+          description: Clock status updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  employees_on_clock:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        emp_id:
+                          type: string
+                        start_datetime:
+                          type: string
+                          format: date-time
+                        station_id:
+                          type: string
+                        act_prod_dt:
+                          type: string
+                          format: date
+                        rpt_shift_id:
+                          type: integer
+                  transaction:
+                    type: object
+                    properties:
+                      complete:
+                        type: boolean
+                        description: Indicates if the transaction was successful
+                      security_level:
+                        type: string
+                        description: The security level of the employee or request
+                      details:
+                        type: string
+                        description: Additional status or error message
+  /employees/clock/details:
+    get:
+      summary: Retrieves detailed clock-in information for employees
+      tags:
+        - Employees
+      description: >
+        Returns a detailed list of employees currently on the clock, including information about
+        the department, job, operation, and active time metrics. This endpoint provides a deeper
+        view than the standard `/employees/clock` endpoint.
+      responses:
+        '200':
+          description: Detailed employee clock-in data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  employees_on_clock:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        emp_id:
+                          type: string
+                          description: Employee ID
+                          example: "00001"
+                        dept_id:
+                          type: string
+                          description: Department ID
+                          example: "9273"
+                        part_id:
+                          type: string
+                          description: Part or item being worked on
+                          example: "3085-100-V1"
+                        ord_id:
+                          type: string
+                          description: Order ID
+                          example: "31839912"
+                        opr_seq_no:
+                          type: integer
+                          description: Operation sequence number
+                          example: 10
+                        task_id:
+                          type: string
+                          description: Task ID associated with the operation
+                          example: ""
+                        act_stat:
+                          type: string
+                          description: Activity status (e.g., R = Running, C = Complete)
+                          example: "R"
+                        standard_hrs:
+                          type: number
+                          format: float
+                          description: Standard hours for the operation
+                          example: 6.5
+                        emp_active_tm:
+                          type: integer
+                          description: Total time the employee has been active (in seconds)
+                          example: 10456403
+                        total_active_tm:
+                          type: integer
+                          description: Total active time across all employees (in seconds)
+                          example: 10456403
+                        total_prob_tm:
+                          type: integer
+                          description: Total problem time (in seconds)
+                          example: 69744
+                        total_run_tm:
+                          type: integer
+                          description: Total run time (in seconds)
+                          example: 8981153
+                        total_hrs_earned:
+                          type: number
+                          format: float
+                          description: Total earned hours
+                          example: 3230.5
+  /employees/job:
+    put:
+      summary: Assigns an employee to a job operation
+      tags:
+        - Employees
+      description: >
+        Adds an employee to a specific operation within an order. The employee must be currently clocked in
+        for the assignment to be processed. This is used to track which employees are actively working on
+        specific jobs on the shop floor.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - emp_id
+                - ord_id
+                - opr_no
+                - station_id
+                - action
+              properties:
+                emp_id:
+                  type: string
+                  description: Employee ID
+                ord_id:
+                  type: string
+                  description: Order ID
+                opr_no:
+                  type: integer
+                  description: Operation sequence number
+                station_id:
+                  type: string
+                  description: Station ID
+                action:
+                  type: boolean
+                  description: >
+                    `true` to assign the employee, `false` to remove them
+      responses:
+        '200':
+          description: Job assignment processed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  emp_on_job:
+                    type: array
+                    description: Details of the employee's job assignment
+                    items:
+                      type: object
+                      properties:
+                        emp_id:
+                          type: string
+                          description: Employee ID
+                        ord_id:
+                          type: string
+                          description: Order ID
+                        opr_seq_no:
+                          type: integer
+                          description: Operation sequence number
+                        stat_id:
+                          type: string
+                          description: Reported status
+                        stat_code:
+                          type: string
+                          description: Problem code (if applicable)
+                        start_datetime:
+                          type: string
+                          format: date-time
+                          description: Timestamp the employee started the operation
+                        is_lead:
+                          type: boolean
+                          description: Whether the employee is the lead for this operation
+                        act_prod_dt:
+                          type: string
+                          format: date
+                          description: Production date
+                        rpt_shift_id:
+                          type: integer
+                          description: Reported shift ID
+                        first_jobin_job:
+                          type: string
+                          format: date-time
+                          description: First clock-in timestamp for this job
+                        first_jobin_shift:
+                          type: string
+                          format: date-time
+                          description: First clock-in timestamp for this shift
+                        first_jobin_job_and_shift:
+                          type: string
+                          format: date-time
+                          description: First clock-in timestamp for both this job and shift
+                  transaction:
+                    type: object
+                    properties:
+                      complete:
+                        type: boolean
+                        description: Indicates if the transaction was successful
+                      details:
+                        type: string
+                        description: Additional status or error information
+  /employees/task:
+    put:
+      summary: Assigns an employee to a task
+      tags:
+        - Employees
+      description: >
+        Assigns an employee to a specific task. The employee must be active on the system.
+        This action helps track individual task responsibilities and progress within an operation.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                emp_id:
+                  type: string
+                  description: Employee ID
+                ord_id:
+                  type: string
+                  description: Order ID
+                opr_no:
+                  type: integer
+                  description: Operation sequence number
+                station_id:
+                  type: string
+                  description: Station ID
+                task_id:
+                  type: string
+                  description: Task ID
+                action:
+                  type: boolean
+                  description: >
+                    `true` to assign the task, `false` to remove
+      responses:
+        '200':
+          description: Task assignment processed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  emp_on_task:
+                    type: object
+                    description: Information about the employee assigned to the task
+                    properties:
+                      emp_id:
+                        type: string
+                        description: Employee ID
+                        example: "00001"
+                      full_name:
+                        type: string
+                        description: Full name of the employee
+                        example: "JOHN SMITH"
+                      schd_shift_id:
+                        type: integer
+                        description: Scheduled shift ID
+                        example: 1
+                      dept_id:
+                        type: string
+                        description: Department ID
+                        example: "9273"
+                  transaction:
+                    type: object
+                    properties:
+                      complete:
+                        type: boolean
+                        description: Indicates if the task transaction was successful
+                      details:
+                        type: string
+                        description: Additional status or error information
+                      security_level:
+                        type: string
+                        description: User or role security level applied to the transaction
+  /inventory:
+    get:
+      summary: Retrieves inventory by material ID
+      tags:
+        - Materials
+      description: >
+        Returns the inventory records associated with a specific material.
+        This includes quantities, batch information, unit of measure, and weight/dimensions.
+        The `id` query parameter is required.
+      parameters:
+        - name: id
+          in: query
+          description: Material ID to query inventory for
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Inventory data for specified material
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  inventory:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        qty:
+                          type: number
+                          description: Total quantity on hand
+                          example: 24
+                        create_expire_date:
+                          type: string
+                          description: Creation or expiration date (if set)
+                          example: ""
+                        update_datetime:
+                          type: string
+                          format: date-time
+                          description: Timestamp of last update
+                          example: "2024-04-09T11:35:53.000"
+                        batch_no:
+                          type: string
+                          description: Batch number
+                          example: "F2"
+                        ser_no:
+                          type: string
+                          description: Serial number (if any)
+                          example: ""
+                        lot_no:
+                          type: string
+                          description: Lot number (if any)
+                          example: ""
+                        misc_no:
+                          type: string
+                          description: Miscellaneous tracking number
+                          example: ""
+                        item_wgt:
+                          type: number
+                          description: Item weight
+                          example: 87
+                        item_h:
+                          type: string
+                          description: Item height
+                          example: ""
+                        item_w:
+                          type: string
+                          description: Item width
+                          example: ""
+                        item_l:
+                          type: string
+                          description: Item length
+                          example: ""
+                        UOM:
+                          type: string
+                          description: Unit of Measure
+                          example: "EA"
+                        qty_available:
+                          type: number
+                          description: Quantity available
+                          example: -63
+                        qty_allocated:
+                          type: number
+                          description: Quantity allocated
+                          example: 0
+                        qty_to_post:
+                          type: number
+                          description: Quantity to be posted
+                          example: 87
+                        expire_date:
+                          type: string
+                          format: date
+                          nullable: true
+                          description: Expiration date of the material
+                          example: null
+    post:
+      summary: Post inventory usage for a material
+      tags:
+        - Materials
+      description: >
+        Posts usage or movement of a material for a specific station.
+        Requires both the material ID and the station ID as query parameters.
+      parameters:
+        - name: id
+          in: query
+          description: Material ID for the inventory record
+          required: true
+          schema:
+            type: string
+        - name: station_id
+          in: query
+          description: Station ID where the material is being used or moved
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Inventory transaction response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  transaction:
+                    type: object
+                    properties:
+                      complete:
+                        type: boolean
+                        description: Indicates if the inventory transaction was successful
+                        example: true
+  /machines/dispatch:
+    get:
+      summary: Retrieves dispatch list for a machine
+      tags:
+        - Resources
+      description: >
+        Returns a list of order operations currently dispatched to a given machine.
+        These operations represent the work scheduled or available for execution at that machine.
+      parameters:
+        - name: id
+          in: query
+          description: Machine ID to retrieve dispatch list for
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Dispatch operations for the machine
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  machine_dispatch:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        part_id:
+                          type: string
+                          description: Part number associated with the operation
+                        opr_qty:
+                          type: integer
+                          description: Operation quantity
+                        act_stat:
+                          type: string
+                          description: Activity status (e.g., P = Pending, L = Launched)
+                        cust_req_dt:
+                          type: string
+                          format: date
+                          description: Customer requested completion date
+                        schd_start_dt:
+                          type: string
+                          format: date-time
+                          description: Scheduled operation start date and time
+                        schd_ord_cmpl_dt:
+                          type: string
+                          format: date
+                          description: Scheduled order completion date
+                        schd_stop_dt:
+                          type: string
+                          format: date-time
+                          description: Scheduled operation stop date and time
+                        prob_id:
+                          type: string
+                          description: Associated problem code, if any
+                        opr_seq_no:
+                          type: integer
+                          description: Operation sequence number
+                        ord_id:
+                          type: string
+                          description: Order ID
+                        schd_hrs:
+                          type: number
+                          format: float
+                          description: Scheduled hours for the operation
+                        is_org_res:
+                          type: boolean
+                          description: Indicates if the machine is the original resource
+                        has_ord_rmk:
+                          type: boolean
+                          description: Whether the order has associated remarks
+                        has_part_rmk:
+                          type: boolean
+                          description: Whether the part has associated remarks
+                        part_desc:
+                          type: string
+                          description: Description of the part
+                        wrk_ord_id:
+                          type: string
+                          description: Work order ID
+  /machines:
+    get:
+      summary: Retrieves machine list
+      tags:
+        - Resources
+      description: >
+        Returns a list of machines configured in the system. Optionally, filter results by a specific machine ID
+        using the `id` query parameter.
+      parameters:
+        - name: id
+          in: query
+          description: Filter machines by machine ID
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of machines
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  machines:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        machine_id:
+                          type: string
+                          description: Unique identifier of the machine
+                          example: "5120"
+                        res_desc:
+                          type: string
+                          description: Description or display name of the machine
+                          example: "ECLIPSE"
+                        wrk_cntr_id:
+                          type: string
+                          description: Work center ID the machine is associated with
+                          example: "OEM GEN"
+                        is_auto:
+                          type: boolean
+                          description: Whether the machine is automated
+                          example: true
+                        is_trkd:
+                          type: boolean
+                          description: Whether the machine is tracked for reporting purposes
+                          example: false
+  /machines/image:
+    get:
+      summary: Retrieves locally stored machine images
+      tags:
+        - Resources
+      description: >
+        Retrieves the locally stored image associated with a specific machine.
+        The image can either be stored in a database BLOB or as a file path, depending on its category.
+      parameters:
+        - name: machine_id
+          in: query
+          required: true
+          description: The ID of the machine whose image is being requested
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful image retrieval
+          content:
+            image/png:
+              schema:
+                type: string
+                format: binary
+  /machines/init:
+    post:
+      summary: Initializes machines with machine monitor
+      tags:
+        - Resources
+      description: >
+        Initializes a machine for monitoring by linking it with a station.
+        Requires the machine ID as a query parameter and the station ID as a form field.
+      parameters:
+        - name: id
+          in: query
+          required: true
+          description: Machine ID to initialize
+          schema:
+            type: string
+      requestBody:
+              required: true
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      station_id:
+                        type: string
+                        description: Station ID
+      responses:
+        '200':
+          description: Machine initialization successful – no content returned
+        '400':
+          description: Missing or invalid parameters
+        '500':
+          description: Internal server error during initialization
+  /materials:
+    get:
+      summary: Retrieves material list
+      tags:
+        - Materials
+      description: >
+        Returns a list of materials available in the system. Optionally, filter results by a specific
+        material ID using the `id` query parameter.
+      parameters:
+        - name: id
+          in: query
+          description: Filter materials by material ID
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of materials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  materials:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        matl_id:
+                          type: string
+                          description: Material ID
+                          example: "1159B57292-PKG3"
+                        matl_desc:
+                          type: string
+                          description: Material description
+                          example: "INSTALLATION KIT"
+  /opcua/ping:
+    get:
+      summary: Ping opcua connector
+      tags:
+        - OPC UA
+      description: >
+        Checks the status of the OPC UA connection. This endpoint is used to verify that the OPC UA connection is active and functioning properly.
+      responses:
+        '200':
+          description: Connection is active
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ping:
+                    type: boolean
+                    example: true
+                    description: True if the OPC UA connection is established
+  /opcua/report:
+    post:
+      summary: Submit OPC UA batch report
+      tags:
+        - OPC UA
+      description: >
+        Used by the OPC UA connector to send a batch report containing all published connection data.
+        The data is submitted as a string payload in the `in_batch` field.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                in_batch:
+                  type: string
+                  description: Stringified batch report from the OPC UA connector
+                  example: "batch_id=ABC123;timestamp=2025-04-07T10:00:00Z;..."
+      responses:
+        '200':
+          description: Report processed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  transaction:
+                    type: object
+                    properties:
+                      complete:
+                        type: boolean
+                        description: Indicates if the report was processed without errors
+                        example: true
+  /orders:
+    get:
+      summary: Retrieves order details
+      tags:
+        - Orders
+      description: >
+        Returns detailed information about a specific order based on the provided order ID.
+        Includes scheduling, part, customer, status, and routing details.
+      parameters:
+        - name: id
+          in: query
+          description: Order ID to retrieve details for
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Detailed information for the specified order
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  order_info:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        plt_id:
+                          type: string
+                          description: Plant ID
+                        ord_id:
+                          type: string
+                          description: Order ID
+                        rtg_id:
+                          type: string
+                          description: Routing ID
+                        rtg_desc:
+                          type: string
+                          description: Routing description
+                        part_id:
+                          type: string
+                          description: Part number
+                        qty:
+                          type: integer
+                          description: Quantity on the order
+                        cust_req_dt:
+                          type: string
+                          format: date
+                          description: Customer requested date
+                        factory_req_dt:
+                          type: string
+                          format: date
+                          description: Factory required date
+                        schd_start_dt:
+                          type: string
+                          format: date
+                          description: Scheduled start date
+                        schd_stop_dt:
+                          type: string
+                          format: date
+                          description: Scheduled stop date
+                        ord_stat:
+                          type: string
+                          description: Order status code
+                        req_tm:
+                          type: number
+                          description: Required time
+                        qty_per_day:
+                          type: number
+                          description: Quantity per day
+                        no_of_days:
+                          type: number
+                          description: Number of scheduled days
+                        is_forward:
+                          type: boolean
+                          description: Is the order forward scheduled
+                        plnd_start_date:
+                          type: string
+                          format: date
+                          nullable: true
+                          description: Planned start date
+                        cust_id:
+                          type: string
+                          description: Customer ID
+                        run_stat:
+                          type: string
+                          description: Run status
+                        qty_cmpl:
+                          type: integer
+                          description: Quantity completed
+                        qty_scrp:
+                          type: integer
+                          description: Quantity scrapped
+                        rel_date:
+                          type: string
+                          format: date-time
+                          description: Release date
+                        attr_seq:
+                          type: string
+                          description: Attribute sequence
+                        ord_rmk:
+                          type: string
+                          description: Order remarks or instructions
+                        is_hot:
+                          type: boolean
+                          description: Indicates if the order is hot priority
+                        ord_line:
+                          type: string
+                          description: Order line number
+                        ord_type:
+                          type: string
+                          description: Order type code
+                        cust_po_no:
+                          type: string
+                          description: Customer purchase order number
+                        act_cmpl_date:
+                          type: string
+                          format: date
+                          nullable: true
+                          description: Actual completion date
+  /orders/details:
+    get:
+      summary: Retrieves order extended details
+      tags:
+        - Orders
+      description: >
+        Returns detailed information about a specific order based on the provided order ID.
+        Includes scheduling, part, customer, status, and routing details.
+      parameters:
+        - name: id
+          in: query
+          description: Order ID to retrieve details for
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Detailed information for the specified order including extended information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  details:
+                    type: object
+                    properties:
+                      OLot:
+                        type: string
+                      QRelDt:
+                        type: string
+                        example: date
+                      RM:
+                        type: string
+                      ShipNo:
+                        type: string
+                  order_info:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        plt_id:
+                          type: string
+                          description: Plant ID
+                        ord_id:
+                          type: string
+                          description: Order ID
+                        rtg_id:
+                          type: string
+                          description: Routing ID
+                        rtg_desc:
+                          type: string
+                          description: Routing description
+                        part_id:
+                          type: string
+                          description: Part number
+                        qty:
+                          type: integer
+                          description: Quantity on the order
+                        cust_req_dt:
+                          type: string
+                          format: date
+                          description: Customer requested date
+                        factory_req_dt:
+                          type: string
+                          format: date
+                          description: Factory required date
+                        schd_start_dt:
+                          type: string
+                          format: date
+                          description: Scheduled start date
+                        schd_stop_dt:
+                          type: string
+                          format: date
+                          description: Scheduled stop date
+                        ord_stat:
+                          type: string
+                          description: Order status code
+                        req_tm:
+                          type: number
+                          description: Required time
+                        qty_per_day:
+                          type: number
+                          description: Quantity per day
+                        no_of_days:
+                          type: number
+                          description: Number of scheduled days
+                        is_forward:
+                          type: boolean
+                          description: Is the order forward scheduled
+                        plnd_start_date:
+                          type: string
+                          format: date
+                          nullable: true
+                          description: Planned start date
+                        cust_id:
+                          type: string
+                          description: Customer ID
+                        run_stat:
+                          type: string
+                          description: Run status
+                        qty_cmpl:
+                          type: integer
+                          description: Quantity completed
+                        qty_scrp:
+                          type: integer
+                          description: Quantity scrapped
+                        rel_date:
+                          type: string
+                          format: date-time
+                          description: Release date
+                        attr_seq:
+                          type: string
+                          description: Attribute sequence
+                        ord_rmk:
+                          type: string
+                          description: Order remarks or instructions
+                        is_hot:
+                          type: boolean
+                          description: Indicates if the order is hot priority
+                        ord_line:
+                          type: string
+                          description: Order line number
+                        ord_type:
+                          type: string
+                          description: Order type code
+                        cust_po_no:
+                          type: string
+                          description: Customer purchase order number
+                        act_cmpl_date:
+                          type: string
+                          format: date
+                          nullable: true
+                          description: Actual completion date
+  /orders/operations:
+    get:
+      summary: Retrieves operations for a specific order
+      tags:
+        - Orders
+      description: >
+        Returns all operations associated with a given order. You can filter the result by an optional
+        operation sequence number using `opr_no`.
+      parameters:
+        - name: id
+          in: query
+          description: Order ID to retrieve operations for
+          required: true
+          schema:
+            type: string
+        - name: opr_no
+          in: query
+          description: Optional operation sequence number to filter by
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of operations for the specified order
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  operations:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        opr_seq_no:
+                          type: integer
+                          description: Operation sequence number
+                        opr_desc:
+                          type: string
+                          description: Operation description
+                        act_stat:
+                          type: string
+                          description: Activity status (e.g., C = Complete, R = Running)
+                        plnd_qty:
+                          type: integer
+                          description: Planned quantity
+                        plnd_start_date:
+                          type: string
+                          format: date-time
+                        schd_start_date:
+                          type: string
+                          format: date-time
+                        act_start_date:
+                          type: string
+                          format: date-time
+                        plnd_stop_date:
+                          type: string
+                          format: date-time
+                        schd_stop_date:
+                          type: string
+                          format: date-time
+                        act_cmpl_date:
+                          type: string
+                          format: date-time
+                        qty_good:
+                          type: integer
+                        qty_scrap:
+                          type: integer
+                        queue_time:
+                          type: integer
+                          description: Time spent in queue (in seconds)
+                        setup_time:
+                          type: integer
+                        run_time:
+                          type: integer
+                        idle_time:
+                          type: integer
+                        problem_time:
+                          type: integer
+                        tear_down_time:
+                          type: integer
+                        oee_avail:
+                          type: number
+                        oee_qual:
+                          type: number
+                        oee_perf:
+                          type: number
+                        oee_total:
+                          type: number
+                        eff_total:
+                          type: number
+                        problem_id:
+                          type: string
+                        schd_time:
+                          type: number
+                        pacing_machine_id:
+                          type: string
+                        std_setup_time:
+                          type: number
+                        std_tear_down_time:
+                          type: number
+                        pieces_per_hour:
+                          type: number
+                        hours_per_piece:
+                          type: number
+                        act_pieces_per_hour:
+                          type: number
+                        act_hours_per_piece:
+                          type: number
+                        work_order_id:
+                          type: string
+  /orders/operation/comments:
+    get:
+      summary: Retrieves comments for an order operation
+      tags:
+        - Orders
+      description: >
+        Returns comments related to the specified order operation. Requires an `id` query parameter
+        representing the order ID.
+      parameters:
+        - name: id
+          in: query
+          description: Order ID for which to retrieve comments
+          required: true
+          schema:
+            type: string
+        - name: opr_no
+          in: query
+          description: Operation sequence number
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Operation comments retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  comments:
+                    type: string
+                    description: Comments related to the order operation
+                    example: "No comments for 29541650-0"
+  /orders/operation/employees:
+    get:
+      summary: Retrieves employees on an order operation
+      tags:
+        - Orders
+      description: >
+        Returns a list of employees currently assigned to a specific operation within an order.
+        Both `id` (order ID) and `opr_no` (operation sequence number) query parameters are required.
+      parameters:
+        - name: id
+          in: query
+          description: Order ID to retrieve employees for
+          required: true
+          schema:
+            type: string
+        - name: opr_no
+          in: query
+          description: Operation sequence number to retrieve employees for
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Employees assigned to the specified operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  employees:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        emp_id:
+                          type: string
+                          description: Employee ID
+                        stat_id:
+                          type: string
+                          description: Status ID (e.g., R = Running, C = Complete)
+                        stat_code:
+                          type: string
+                          description: Status or problem code
+                        start_datetime:
+                          type: string
+                          format: date-time
+                          description: Timestamp when the employee started on the job
+                        is_lead:
+                          type: boolean
+                          description: Indicates if the employee is the lead on the operation
+                        act_prod_dt:
+                          type: string
+                          format: date
+                          description: Active production date
+                        rpt_shift_id:
+                          type: integer
+                          description: Reported shift ID
+                        first_jobin_job:
+                          type: string
+                          format: date-time
+                          nullable: true
+                          description: First time the employee started this job
+                        first_jobin_shift:
+                          type: string
+                          format: date-time
+                          nullable: true
+                          description: First time the employee started this shift
+                        first_jobin_job_and_shift:
+                          type: string
+                          format: date-time
+                          nullable: true
+                          description: First time the employee started this job and shift
+  /orders/operation/employees/history:
+    get:
+      summary: Retrieves employee order operation history
+      tags:
+        - Orders
+      description: >
+        Returns the historical job activity for a specific employee on a given order operation.
+        Useful for auditing employee performance and tracking lead/operator assignments.
+      parameters:
+        - name: id
+          in: query
+          required: true
+          description: Order ID
+          schema:
+            type: string
+        - name: opr_no
+          in: query
+          required: true
+          description: Operation Sequence Number
+          schema:
+            type: integer
+        - name: emp_id
+          in: query
+          required: true
+          description: Employee ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of historical records for employee on specified operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  emp_history:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        emp_id:
+                          type: string
+                          example: "00001"
+                        stat_id:
+                          type: string
+                          example: "R"
+                        stat_code:
+                          type: string
+                          example: ""
+                        start_datetime:
+                          type: string
+                          format: date-time
+                          example: "2025-01-30T11:27:02.000"
+                        is_lead:
+                          type: boolean
+                          example: true
+                        act_prod_dt:
+                          type: string
+                          format: date
+                          example: "2024-01-05"
+                        rpt_shift_id:
+                          type: integer
+                          example: 1
+                        first_jobin_job:
+                          type: string
+                          format: date-time
+                          example: "2025-01-30T11:27:02.000"
+                        first_jobin_shift:
+                          type: string
+                          format: date-time
+                          nullable: true
+                        first_jobin_job_and_shift:
+                          type: string
+                          format: date-time
+                          nullable: true
+  /orders/operation/machines:
+    post:
+      summary: Updates operation machine assignment
+      tags:
+        - Orders
+      description: >
+        Reassigns a machine (resource) for a specific order operation.
+        Requires both the order ID and operation sequence number as query parameters,
+        and expects machine reassignment details in the request body.
+      parameters:
+        - name: id
+          in: query
+          required: true
+          description: Order ID
+          schema:
+            type: string
+        - name: opr_no
+          in: query
+          required: true
+          description: Operation Sequence Number
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - old_res
+                - new_res
+                - emp_id
+                - station_id
+                - default_units
+              properties:
+                old_res:
+                  type: string
+                  description: Previously assigned machine/resource
+                new_res:
+                  type: string
+                  description: Newly assigned machine/resource
+                emp_id:
+                  type: string
+                  description: Employee performing the reassignment
+                station_id:
+                  type: string
+                  description: Station where the reassignment is taking place
+                default_units:
+                  type: string
+                  description: Default unit setting for the machine
+      responses:
+        '200':
+          description: Machine assignment updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  machine_update:
+                    type: object
+                    properties:
+                      Previous Resource:
+                        type: string
+                      New Resource:
+                        type: string
+                      Employee:
+                        type: string
+                      Default Units:
+                        type: string
+                  transaction:
+                    type: object
+                    properties:
+                      complete:
+                        type: boolean
+                        example: true
+                      details:
+                        type: string
+                        example: "Machine successfully reassigned"
+
+  /orders/operation/materials:
+    get:
+      summary: Retrieves materials for an order operation
+      tags:
+        - Orders
+      description: >
+        Returns a list of materials associated with a specific operation in an order.
+        Both `id` (order ID) and `opr_no` (operation sequence number) query parameters are required.
+      parameters:
+        - name: id
+          in: query
+          description: Order ID for the material request
+          required: true
+          schema:
+            type: string
+        - name: opr_no
+          in: query
+          description: Operation sequence number
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Materials linked to the operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  materials:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        matl_id:
+                          type: string
+                          description: Material ID
+                          example: "3085 CLOTH KIT"
+                        matl_desc:
+                          type: string
+                          description: Material description
+                          example: "CLOTH KIT FOR 3085"
+                        unit_of_measure:
+                          type: string
+                          description: Unit of measure
+                          example: "EA"
+                        units_req:
+                          type: number
+                          description: Number of units required
+                          example: 1
+                        qty_posted:
+                          type: number
+                          description: Quantity already posted
+                          example: 0
+                        units_per:
+                          type: number
+                          description: Units per operation
+                          example: 1
+                        lot_controlled:
+                          type: boolean
+                          description: Whether the material is lot controlled
+                          example: false
+  /machines/count:
+    get:
+      summary: Retrieves machine count for monitored machine 
+      tags:
+        - Machine Monitor
+      parameters:
+        - name: id
+          in: query
+          description: Resource ID for monitored machine
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Machine count for monitored machine
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  materials:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        count:
+                          type: integer
+                          example: 0
+    put:
+      summary: Add machine count for monitored machine 
+      tags:
+        - Machine Monitor
+      parameters:
+        - name: id
+          in: query
+          description: Resource ID for monitored machine
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - count
+              properties:
+                count:
+                  type: integer
+                  description: Count to add to machine
+      responses:
+        '200':
+          description: Count has been added to machine
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+                    example: 0
+    post:
+      summary: Update machine count for monitored machine
+      tags:
+        - Machine Monitor
+      parameters:
+        - name: id
+          in: query
+          description: Resource ID for monitored machine
+          required: true
+          schema:
+            type: string
+        - name: modType
+          in: query
+          description: Type of modification (Add, Fix, Replace, Discard)
+          required: true
+          example: "Add"
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - count
+              properties:
+                count:
+                  type: integer
+                  description: Count to add to machine
+      responses:
+        '200':
+          description: Count has been added to machine
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+                    example: 0
+    delete:
+      summary: Remove machine count for monitored machine
+      tags:
+        - Machine Monitor
+      parameters:
+        - name: id
+          in: query
+          description: Resource ID for monitored machine
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Delete count for monitored machine
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+                    example: 0
+  /orders/operation/materials/usage:
+    get:
+      summary: Get Material Usage for Operation
+      description: |
+        Retrieves usage data for a specific material (`matl`) within a given order (`ord`) and operation sequence number (`opr`).
+        Returns detailed usage information including quantities, timestamps, and tracking info.
+      tags:
+        - Materials
+      parameters:
+        - name: ord
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Order ID
+        - name: opr
+          in: query
+          required: true
+          schema:
+            type: integer
+          description: Operation Sequence Number
+        - name: matl
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Material ID
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    ord_id:
+                      type: string
+                    opr_seq_no:
+                      type: integer
+                    matl_id:
+                      type: string
+                    machine_id:
+                      type: string
+                      description: Machine pacing resource ID
+                    act_event_date:
+                      type: string
+                      format: date-time
+                    qty_rpt:
+                      type: number
+                      format: float
+                    emp_id:
+                      type: string
+                    act_prod_dt:
+                      type: string
+                      format: date
+                    rpt_shift_id:
+                      type: integer
+                    station_id:
+                      type: string
+                    site_plt_id:
+                      type: string
+                    batch_no:
+                      type: string
+                    ser_no:
+                      type: string
+                    lot_no:
+                      type: string
+                    misc_no:
+                      type: string
+                    is_scrp:
+                      type: boolean
+                    scrp_id:
+                      type: string
+                    tag_id:
+                      type: string
+
+    post:
+      summary: Post Material Usage for Operation
+      description: |
+        Submits material usage data for a given order and operation sequence.
+        Requires `ord`, `opr`, and `matl` query parameters.
+        Returns a transaction response with completion status and additional details.
+      tags:
+        - Materials
+      parameters:
+        - name: ord
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Order ID
+        - name: opr
+          in: query
+          required: true
+          schema:
+            type: integer
+          description: Operation Sequence Number
+        - name: matl
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Material ID
+      responses:
+        '200':
+          description: Transaction status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  complete:
+                    type: boolean
+                    description: Whether the transaction was completed successfully.
+                  details:
+                    type: object
+                    description: Additional details or data related to the transaction.
+  /orders/operations/machines/monitor:
+    get:
+      summary: Retrieves a machine data from monitored job
+      tags:
+        - Machine Monitor
+      description: Returns the machine monitoring data for a specified machine, including order and operation info.
+      parameters:
+        - name: id
+          in: query
+          required: true
+          description: Machine ID to retrieve monitoring data for
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  machine_monitor:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        res_id:
+                          type: string
+                        ord_id:
+                          type: string
+                        opr_seq_no:
+                          type: integer
+                        is_actv:
+                          type: boolean
+                        mach_pointer:
+                          type: string
+                        mach_stat:
+                          type: string
+                        good_cycle:
+                          type: number
+                          format: float
+                        scrap_cycle:
+                          type: number
+                          format: float
+  /temp-tables:
+    get:
+      summary: GetDynTables
+      tags:
+        - System
+      responses:
+        '200':
+          description: Successful response
+  /documents:
+    get:
+      summary: Retrieves local documents
+      tags:
+        - Documents
+      description: >
+        Retrieves a document based on document group, document ID, station, order ID,
+        and operation sequence number. This endpoint is used to locate and open a document
+        hosted on the local system or intranet.
+      parameters:
+        - name: doc_grp
+          in: query
+          required: true
+          description: Document group identifier
+          schema:
+            type: string
+        - name: doc
+          in: query
+          required: true
+          description: Document ID
+          schema:
+            type: string
+        - name: station
+          in: query
+          required: true
+          description: Station ID where the document is being accessed
+          schema:
+            type: string
+        - name: ord
+          in: query
+          required: true
+          description: Order ID associated with the document
+          schema:
+            type: string
+        - name: opr
+          in: query
+          required: true
+          description: Operation sequence number associated with the document
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Document successfully retrieved (PDF expected)
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+  /orders/operation/materials/report:
+    post:
+      summary: Reports material usage
+      tags:
+        - Materials
+      description: > 
+        Reports material usage for a specific operation on an order. 
+        Requires order ID, station ID, and operation number as query parameters.
+      parameters:
+        - name: ord
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Order ID
+        - name: station_id
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Station ID
+        - name: opr
+          in: query
+          required: true
+          schema:
+            type: integer
+          description: Operation sequence number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                matl_id:
+                  type: string
+                emp_id:
+                  type: string
+                batch_no:
+                  type: string
+                lot_no:
+                  type: string
+                ser_no:
+                  type: string
+                qty_rpt:
+                  type: number
+                  format: float
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  material_usage:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        ord_id:
+                          type: string
+                        opr_seq_no:
+                          type: integer
+                        matl_id:
+                          type: string
+                        machine_id:
+                          type: string
+                        act_event_date:
+                          type: string
+                          format: date-time
+                        qty_rpt:
+                          type: number
+                          format: float
+                        emp_id:
+                          type: string
+                        act_prod_dt:
+                          type: string
+                          format: date
+                        rpt_shift_id:
+                          type: integer
+                        station_id:
+                          type: string
+                        site_plt_id:
+                          type: string
+                        batch_no:
+                          type: string
+                        ser_no:
+                          type: string
+                        lot_no:
+                          type: string
+                        misc_no:
+                          type: string
+                        is_scrp:
+                          type: boolean
+                        scrp_id:
+                          type: string
+                        tag_id:
+                          type: string
+                  transaction:
+                    type: object
+                    properties:
+                      complete:
+                        type: boolean
+                      details:
+                        type: string
+  /orders/operation/opctrl:
+    get:
+      summary: Retrieves operator control data for resource
+      tags:
+        - Orders
+      description: Returns the operator control dashboard for a specific machine resource. Displays machine dispatch data, operation information, and active employees.
+      parameters:
+        - name: res_id
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Resource ID (Machine ID)
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  operator_info:
+                    type: object
+                    properties:
+                      ds_opr_control:
+                        type: object
+                        properties:
+                          machine:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                machine_id:
+                                  type: string
+                                res_desc:
+                                  type: string
+                                wrk_cntr_id:
+                                  type: string
+                                is_auto:
+                                  type: boolean
+                                is_trkd:
+                                  type: boolean
+                                machine_dispatch:
+                                  type: array
+                                  items:
+                                    type: object
+                                    properties:
+                                      part_id:
+                                        type: string
+                                      opr_qty:
+                                        type: integer
+                                      act_stat:
+                                        type: string
+                                      cust_req_dt:
+                                        type: string
+                                        format: date
+                                      schd_start_dt:
+                                        type: string
+                                        format: date-time
+                                      schd_ord_cmpl_dt:
+                                        type: string
+                                        format: date
+                                      schd_stop_dt:
+                                        type: string
+                                        format: date-time
+                                      prob_id:
+                                        type: string
+                                      opr_seq_no:
+                                        type: integer
+                                      ord_id:
+                                        type: string
+                                      schd_hrs:
+                                        type: number
+                                      is_org_res:
+                                        type: boolean
+                                      has_ord_rmk:
+                                        type: boolean
+                                      has_part_rmk:
+                                        type: boolean
+                                      part_desc:
+                                        type: string
+                                      wrk_ord_id:
+                                        type: string
+                                      operations:
+                                        type: array
+                                        items:
+                                          type: object
+                                          properties:
+                                            opr_seq_no:
+                                              type: integer
+                                            opr_desc:
+                                              type: string
+                                            act_stat:
+                                              type: string
+                                            plnd_qty:
+                                              type: integer
+                                            plnd_start_date:
+                                              type: string
+                                              format: date-time
+                                            schd_start_date:
+                                              type: string
+                                              format: date-time
+                                            act_start_date:
+                                              type: string
+                                              format: date-time
+                                            plnd_stop_date:
+                                              type: string
+                                              format: date-time
+                                            schd_stop_date:
+                                              type: string
+                                              format: date-time
+                                            act_cmpl_date:
+                                              type: string
+                                              format: date-time
+                                              nullable: true
+                                            qty_good:
+                                              type: integer
+                                            qty_scrap:
+                                              type: integer
+                                            queue_time:
+                                              type: integer
+                                            setup_time:
+                                              type: integer
+                                            run_time:
+                                              type: integer
+                                            idle_time:
+                                              type: integer
+                                            problem_time:
+                                              type: integer
+                                            tear_down_time:
+                                              type: integer
+                                            oee_avail:
+                                              type: number
+                                            oee_qual:
+                                              type: number
+                                            oee_perf:
+                                              type: number
+                                            oee_total:
+                                              type: number
+                                            eff_total:
+                                              type: number
+                                              nullable: true
+                                            problem_id:
+                                              type: string
+                                            schd_time:
+                                              type: number
+                                            pacing_machine_id:
+                                              type: string
+                                            std_setup_time:
+                                              type: number
+                                            std_tear_down_time:
+                                              type: number
+                                            pieces_per_hour:
+                                              type: number
+                                            hours_per_piece:
+                                              type: number
+                                            act_pieces_per_hour:
+                                              type: number
+                                            act_hours_per_piece:
+                                              type: number
+                                              nullable: true
+                                            work_order_id:
+                                              type: string
+                                            operation_employees:
+                                              type: array
+                                              items:
+                                                type: object
+                                                properties:
+                                                  emp_id:
+                                                    type: string
+                                                  stat_id:
+                                                    type: string
+                                                  stat_code:
+                                                    type: string
+                                                  start_datetime:
+                                                    type: string
+                                                    format: date-time
+                                                  is_lead:
+                                                    type: boolean
+                                                  act_prod_dt:
+                                                    type: string
+                                                    format: date
+                                                  rpt_shift_id:
+                                                    type: integer
+                                                  first_jobin_job:
+                                                    type: string
+                                                    format: date-time
+                                                    nullable: true
+                                                  first_jobin_shift:
+                                                    type: string
+                                                    format: date-time
+                                                    nullable: true
+                                                  first_jobin_job_and_shift:
+                                                    type: string
+                                                    format: date-time
+                                                    nullable: true
+  /orders/operation/statusbyhr:
+    get:
+      summary: Retrieves and analyze previous status'
+      tags:
+        - Orders
+      description: Returns the breakdown of time spent in a specified status per hour for a given order operation over a set number of past hours.
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Order ID
+        - name: opr_no
+          in: query
+          required: true
+          schema:
+            type: integer
+          description: Operation sequence number
+        - name: hrs
+          in: query
+          required: true
+          schema:
+            type: integer
+          description: Number of previous hours to analyze
+        - name: stats
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Status to display (e.g., Run, Setup, etc.)
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        time:
+                          type: string
+                          format: date-time
+                        Run_mins:
+                          type: integer
+                          description: Number of minutes in the specified status for the hour
+                        status:
+                          type: string
+                          description: Status label (e.g., Run, Setup)
+
+  /orders/operation/status:
+    get:
+      summary: Retrieves status history for an order operation
+      tags:
+        - Orders
+      description: >
+        Returns the status history of an order operation, including start and stop times,
+        transitions, problem codes, and employee assignments.
+      parameters:
+        - name: id
+          in: query
+          description: Order ID to retrieve status for
+          required: true
+          schema:
+            type: string
+        - name: opr_no
+          in: query
+          description: Operation sequence number
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of status transitions for the operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        emp_id:
+                          type: string
+                        act_stat:
+                          type: string
+                        stat_start_dt:
+                          type: string
+                          format: date-time
+                        stat_stop_dt:
+                          type: string
+                          format: date-time
+                        prev_stat:
+                          type: string
+                        next_stat:
+                          type: string
+                        prob_id:
+                          type: string
+                        hst_level:
+                          type: integer
+                        was_posted:
+                          type: boolean
+                        station_id:
+                          type: string
+    post:
+      summary: Set status for an order operation
+      tags:
+        - Orders
+      description: >
+        Sets a new status for an order operation. Requires `id` and `opr_no` query parameters,
+        and a request body containing resource and employee information.
+      parameters:
+        - name: id
+          in: query
+          description: Order ID for the status update
+          required: true
+          schema:
+            type: string
+        - name: opr_no
+          in: query
+          description: Operation sequence number
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - res_id
+                - emp_id
+                - status_id
+                - status_code
+                - station_id
+              properties:
+                res_id:
+                  type: string
+                  description: Resource ID
+                emp_id:
+                  type: string
+                  description: Employee ID
+                status_id:
+                  type: string
+                  description: Status ID (e.g., R, Q, L)
+                status_code:
+                  type: string
+                  description: Status code or problem code
+                station_id:
+                  type: string
+                  description: Station ID
+      responses:
+        '200':
+          description: Status update result and current status list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  transaction:
+                    type: object
+                    properties:
+                      complete:
+                        type: boolean
+                        description: Whether the status update was successful
+                      details:
+                        type: string
+                        description: Description of the result or error
+                      override-sec-lvl:
+                        type: string
+                        description: Security override level (if applicable)
+                  status:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        emp_id:
+                          type: string
+                        act_stat:
+                          type: string
+                        stat_start_dt:
+                          type: string
+                          format: date-time
+                        stat_stop_dt:
+                          type: string
+                          format: date-time
+                        prev_stat:
+                          type: string
+                        next_stat:
+                          type: string
+                        prob_id:
+                          type: string
+                        hst_level:
+                          type: integer
+                        was_posted:
+                          type: boolean
+                        station_id:
+                          type: string
+  /orders/operation/production:
+    get:
+      summary: Retrieves production data for specific order operation
+      tags:
+        - Orders 
+      description: >
+        Retrieves reported production entries for a specific order operation. 
+        Requires both the order ID and the operation sequence number.
+      parameters:
+        - name: id
+          in: query
+          required: true
+          description: Order ID
+          schema:
+            type: string
+        - name: opr_no
+          in: query
+          required: true
+          description: Operation sequence number
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful response containing a list of reported production entries
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reported_production:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        emp_id:
+                          type: string
+                          description: Employee ID
+                          example: "2026"
+                        rpt_shift_id:
+                          type: integer
+                          description: Reported shift ID
+                          example: 2
+                        act_prod_dt:
+                          type: string
+                          format: date
+                          description: Actual production date
+                          example: "2025-04-03"
+                        act_event_date:
+                          type: string
+                          format: date-time
+                          description: Timestamp of the event
+                          example: "2025-04-03T20:16:41.000"
+                        stat_start_date:
+                          type: string
+                          format: date-time
+                          description: Status start date
+                          example: "2025-04-03T20:16:28.000"
+                        was_good:
+                          type: boolean
+                          description: Indicates if the product was good
+                          example: true
+                        scrp_id:
+                          type: string
+                          description: Scrap ID if applicable
+                          example: ""
+                        machine_id:
+                          type: string
+                          description: Machine ID used
+                          example: "8071"
+                        qty_rpt:
+                          type: integer
+                          description: Quantity reported
+                          example: 1
+                        batch_no:
+                          type: string
+                          description: Batch number
+                          example: ""
+                        ser_no:
+                          type: string
+                          description: Serial number
+                          example: ""
+                        lot_no:
+                          type: string
+                          description: Lot number
+                          example: ""
+                        was_undone:
+                          type: boolean
+                          description: Whether the report was undone
+                          example: false
+                        lbl_id:
+                          type: string
+                          description: Label ID associated with the report
+                          example: "ZDC1KBTJ"
+                        loc_id:
+                          type: string
+                          description: Location ID
+                          example: ""
+                        prod_msgs:
+                          type: string
+                          description: Production messages
+                          example: ""
+                        id:
+                          type: string
+                          description: Internal identifier
+                          example: "0x0000000001"
+    post:
+      summary: Send production quantity report for order operation
+      tags:
+        - Orders
+      description: >
+        Reports production for a specific order operation.
+        Requires the order ID and operation sequence number as query parameters.
+        Accepts details in the request body for production reporting.
+      parameters:
+        - name: id
+          in: query
+          required: true
+          description: Order ID
+          schema:
+            type: string
+        - name: opr_no
+          in: query
+          required: true
+          description: Operation sequence number
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                station_id:
+                  type: string
+                  description: Station identifier
+                emp_id:
+                  type: string
+                  description: Employee identifier
+                qty:
+                  type: number
+                  format: float
+                  description: Quantity reported
+                qty_type:
+                  type: boolean
+                  description: Quantity type (true = good, false = scrap)
+                qty_code:
+                  type: string
+                  description: Code describing the type of quantity (e.g., scrap code)
+                batch_no:
+                  type: string
+                  description: Batch number
+                lot_no:
+                  type: string
+                  description: Lot number
+                ser_no:
+                  type: string
+                  description: Serial number
+                misc_no:
+                  type: string
+                  description: Miscellaneous number
+      responses:
+        '200':
+          description: Successful response indicating production report result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  production_reported:
+                    type: object
+                    description: Echoes the submitted production report
+                    properties:
+                      station_id:
+                        type: string
+                      emp_id:
+                        type: string
+                      qty:
+                        type: number
+                      qty_type:
+                        type: boolean
+                      qty_code:
+                        type: string
+                      batch_no:
+                        type: string
+                      lot_no:
+                        type: string
+                      ser_no:
+                        type: string
+                      misc_no:
+                        type: string
+                  transaction:
+                    type: object
+                    description: Transaction status and details
+                    properties:
+                      complete:
+                        type: boolean
+                        example: true
+                      details:
+                        type: string
+                        example: "Production successfully recorded"
+  /orders/operation/production/undo:
+    post:
+      summary: Undo Quantity
+      description: |
+        Reverses (undos) a quantity that was previously reported for a specific production operation.
+        Requires the `id`, `station`, and `emp` fields in the request body.
+        Returns the undone production record along with status information.
+      tags:
+        - Orders
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - id
+                - station
+                - emp
+              properties:
+                id:
+                  type: string
+                  description: Unique identifier of the production record to undo.
+                station:
+                  type: string
+                  description: Station ID where the production occurred.
+                emp:
+                  type: string
+                  description: Employee ID who is performing the undo action.
+      responses:
+        '200':
+          description: Operation undone successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  operation_production:
+                    type: object
+                    properties:
+                      ord_id:
+                        type: string
+                      opr_seq_no:
+                        type: integer
+                      emp_id:
+                        type: string
+                      rpt_shift_id:
+                        type: integer
+                      act_prod_dt:
+                        type: string
+                        format: date
+                      act_event_date:
+                        type: string
+                        format: date-time
+                      stat_start_date:
+                        type: string
+                        format: date-time
+                      was_good:
+                        type: boolean
+                        description: True if the quantity was marked as good, false if scrap.
+                      scrp_id:
+                        type: string
+                      machine_id:
+                        type: string
+                      qty_rpt:
+                        type: number
+                        format: float
+                      batch_no:
+                        type: string
+                      ser_no:
+                        type: string
+                      lot_no:
+                        type: string
+                      was_undone:
+                        type: boolean
+                      lbl_id:
+                        type: string
+                      loc_id:
+                        type: string
+                      prod_msgs:
+                        type: string
+                      id:
+                        type: string
+                  response:
+                    type: object
+                    properties:
+                      success:
+                        type: boolean
+                      message:
+                        type: string
+  /orders/operation/production/reprint:
+    post:
+      summary: Reprints Production Label
+      description: |
+        Triggers a reprint of a production label based on the production record's row ID and station ID.
+        Both `row_id` and `id` must be provided as query parameters.
+      tags:
+        - Orders
+      parameters:
+        - name: row_id
+          in: query
+          required: true
+          schema:
+            type: string
+          description: The unique row identifier for the production record.
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: string
+          description: The station ID where the reprint should be triggered.
+      responses:
+        '200':
+          description: Label reprint triggered successfully
+  /orders/remark:
+    get:
+      summary: Retrieves remarks from order
+      tags:
+        - Orders
+      description: Retrieves the remarks associated with a specific order.
+      parameters:
+        - name: id
+          in: query
+          required: true
+          description: Order ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  remark:
+                    type: string
+                    description: Full remark text for the order
+
+    put:
+      summary: Add a remark to a specified order
+      tags:
+        - Orders
+      description: Updates the remarks on an order.
+      parameters:
+        - name: id
+          in: query
+          required: true
+          description: Order ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                remark:
+                  type: string
+                  description: Remark to add or update
+                emp_id:
+                  type: string
+                  description: ID of the employee updating the remark
+      responses:
+        '200':
+          description: Successful response after updating remark
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  remark:
+                    type: string
+                    description: Updated remark string
+                  transaction:
+                    type: object
+                    description: Result of the update transaction
+                    properties:
+                      complete:
+                        type: boolean
+                        example: true
+                      details:
+                        type: string
+                        example: "Remark successfully updated"
+  /otoken:
+    get:
+      summary: GET_overridetoken
+      tags:
+        - Supervisor
+      responses:
+        '200':
+          description: Successful response
+    put:
+      summary: PUT_overridetoken
+      tags:
+        - Supervisor
+      responses:
+        '200':
+          description: Successful response
+  /parts:
+    get:
+      summary: Retrieves parts
+      tags:
+        - Parts
+      description: Retrieves parts based on optional filtering by part ID.
+      parameters:
+        - name: id
+          in: query
+          required: false
+          description: Part ID to filter the result
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  parts:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        part_id:
+                          type: string
+                        part_desc:
+                          type: string
+                        rtg_id:
+                          type: string
+                        spcl_use:
+                          type: string
+                        is_purch:
+                          type: boolean
+                        cost:
+                          type: number
+                        sell_price:
+                          type: number
+                        attr_seq:
+                          type: string
+                        part_rmk:
+                          type: string
+                        curr_mtd_run_pct:
+                          type: number
+                        curr_ytd_run_pct:
+                          type: number
+                        curr_mtd_prob_pct:
+                          type: number
+                        curr_ytd_prob_pct:
+                          type: number
+                        reord_qty:
+                          type: number
+                        unit_wt:
+                          type: number
+                        class:
+                          type: string
+                        pkg_type:
+                          type: string
+                        ls_req:
+                          type: string
+                        rev:
+                          type: string
+  /parts/details:
+    get:
+      summary: Retrieves parts with extended details
+      tags:
+        - Parts
+      description: Retrieves parts based on optional filtering by part ID.
+      parameters:
+        - name: id
+          in: query
+          required: false
+          description: Part ID to filter the result
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  details:
+                    type: object
+                    properties:
+                      AutoLot: 
+                        type: string
+                      PartDesc1:
+                        type: string
+                      PartDesc2:
+                        type: string
+                      PGRP:
+                        type: string
+                      PLOC: 
+                        type: string
+                      PLS:
+                        type: string
+                      PPRO:
+                        type: string
+                      PtArt:
+                        type: string
+                      PtChr1:
+                        type: string
+                      PtChr2:
+                        type: string
+                      PtDraw:
+                        type: string
+                      PtDrLoc:
+                        type: string
+                      PtDrSz:
+                        type: string
+                      PtHt:
+                        type: string
+                      PtLg:
+                        type: string
+                      PtLotGrp:
+                        type: string
+                      PtPrdLn:
+                        type: string
+                      PtSz:
+                        type: string
+                      PtWd:
+                        type: string
+                      Shelflife:
+                        type: string
+                      UOM:
+                        type: string
+                  parts:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        part_id:
+                          type: string
+                        part_desc:
+                          type: string
+                        rtg_id:
+                          type: string
+                        spcl_use:
+                          type: string
+                        is_purch:
+                          type: boolean
+                        cost:
+                          type: number
+                        sell_price:
+                          type: number
+                        attr_seq:
+                          type: string
+                        part_rmk:
+                          type: string
+                        curr_mtd_run_pct:
+                          type: number
+                        curr_ytd_run_pct:
+                          type: number
+                        curr_mtd_prob_pct:
+                          type: number
+                        curr_ytd_prob_pct:
+                          type: number
+                        reord_qty:
+                          type: number
+                        unit_wt:
+                          type: number
+                        class:
+                          type: string
+                        pkg_type:
+                          type: string
+                        ls_req:
+                          type: string
+                        rev:
+                          type: string
+  /parts/remark:
+    get:
+      summary: Retrieves part remarks 
+      tags:
+        - Parts
+      description: Retrieves the remark for a specific part.
+      parameters:
+        - name: id
+          in: query
+          required: true
+          description: The part ID to retrieve the remark for
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  remark:
+                    type: string
+                    example: "Ensure component is secured before proceeding to next operation."
+  /sharedlists:
+    post:
+      summary: Creates a Shared List
+      description: |
+        Creates a new shared list using the provided station and operation details.
+        Requires the following parameters: 
+        - `station_id`
+        - `ord_id`
+        - `opr_seq_no`
+        - `var_store`
+        
+        Returns a transaction result with completion status and detailed breakdown.
+      tags:
+        - Lists
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - station_id
+                - ord_id
+                - opr_seq_no
+                - var_store
+              properties:
+                station_id:
+                  type: string
+                  description: The ID of the station.
+                ord_id:
+                  type: string
+                  description: The order ID.
+                opr_seq_no:
+                  type: string
+                  description: The operation sequence number.
+                var_store:
+                  type: string
+                  description: The variable store ID.
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  complete:
+                    type: boolean
+                    description: Whether the transaction completed successfully.
+                  details:
+                    type: object
+                    description: Additional details about the shared list transaction.
+  /stations:
+    get:
+      tags:
+        - Stations
+      summary: Retrieves list of stations
+      description: >
+        Returns a list of all shop floor stations.
+      responses:
+        '200':
+          description: List of available stations
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  stations:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: Unique station identifier
+                          example: station1
+                        description:
+                          type: string
+                          description: Human-readable description of the station
+                          example: description of station1
+  /stations/employees:
+    get:
+      summary: Retrieves employees assigned to a station
+      tags:
+        - Stations
+      description: >
+        Returns a list of employees assigned to a specific station. Requires a station ID
+        passed through the `id` query parameter.
+      parameters:
+        - name: id
+          in: query
+          description: Station ID used to filter employees
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of employees assigned to the specified station
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  employees:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        emp_id:
+                          type: string
+                          description: Employee ID
+                          example: "00001"
+                        full_name:
+                          type: string
+                          description: Full name of the employee
+                          example: "JOHN SMITH"
+  /note:
+    get:
+      summary: Get Note Template Fields
+      description: |
+        Retrieves the template fields for a given note. The `id` query parameter represents the `note_id` and is required.
+        Returns an array of fields as they will appear in navigation or API clients.
+      tags:
+        - Notes
+      parameters:
+        - name: id
+          in: query
+          required: true
+          description: The ID of the note (`note_id`).
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    label:
+                      type: string
+                    component:
+                      type: string
+                    tab_order:
+                      type: integer
+                    x:
+                      type: integer
+                    y:
+                      type: integer
+                    height:
+                      type: integer
+                    width:
+                      type: integer
+                    flex_layout:
+                      type: boolean
+                    values:
+                      type: array
+                      items:
+                        type: string
+                      maxItems: 10
+                    default_value:
+                      type: string
+                    enabled:
+                      type: boolean
+                    visible:
+                      type: boolean
+                    mandatory:
+                      type: boolean
+
+    post:
+      summary: Create a Note
+      description: |
+        Creates a note using provided template and context information.
+        Required query parameters:
+        - `ord` (order ID)
+        - `opr` (operation sequence number)
+
+        Required fields include `station_id`, `emp_id`, `note_id`, etc. The body also includes a `note_data` array.
+      tags:
+        - Notes
+      parameters:
+        - name: ord
+          in: query
+          required: true
+          schema:
+            type: string
+          description: The order ID.
+        - name: opr
+          in: query
+          required: true
+          schema:
+            type: integer
+          description: The operation sequence number.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - station_id
+                - emp_id
+                - note_id
+                - template_id
+                - current_task
+                - current_work_time
+                - current_work_date
+                - current_state
+                - current_code
+                - note_data
+              properties:
+                station_id:
+                  type: string
+                emp_id:
+                  type: string
+                note_id:
+                  type: string
+                template_id:
+                  type: string
+                current_task:
+                  type: string
+                current_work_time:
+                  type: integer
+                current_work_date:
+                  type: string
+                  format: date
+                current_state:
+                  type: string
+                current_code:
+                  type: string
+                note_data:
+                  type: array
+                  items:
+                    type: object
+                    description: A field and value pair representing part of the note data.
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  note:
+                    type: object
+                    properties:
+                      note_id:
+                        type: string
+                      tmplt_id:
+                        type: string
+                      act_event_dt:
+                        type: string
+                        format: date
+                      prod_id:
+                        type: string
+                      act_event_tm:
+                        type: integer
+                      act_note_dt:
+                        type: string
+                        format: date
+                      act_note_tm:
+                        type: integer
+                      opr_seq_no:
+                        type: integer
+                      ord_id:
+                        type: string
+                      emp_id:
+                        type: string
+                      station_id:
+                        type: string
+                      task_id:
+                        type: string
+                      act_stat:
+                        type: string
+                      rpt_shift_id:
+                        type: integer
+                      act_prod_dt:
+                        type: string
+                        format: date
+                  response:
+                    type: object
+                    properties:
+                      success:
+                        type: boolean
+                      message:
+                        type: string
+  /note/by-template:
+    get:
+      summary: Get Note Template with Note
+      description: |
+        Retrieves the note template layout and configuration for a given template ID and order ID.
+        Useful for pre-filling or rendering dynamic note forms in the UI.
+      tags:
+        - Notes
+      parameters:
+        - name: template
+          in: query
+          required: true
+          schema:
+            type: string
+          description: The ID of the note template (`templateId`).
+        - name: ord
+          in: query
+          required: true
+          schema:
+            type: string
+          description: The order ID (`ordId`).
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                description: The fields that make up the note template.
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      description: The internal field name.
+                    label:
+                      type: string
+                      description: The field's display label.
+                    component:
+                      type: string
+                      description: The UI component type (e.g., textbox, dropdown).
+                    tab_order:
+                      type: integer
+                      description: The tab order for the field.
+                    x:
+                      type: integer
+                      description: X position of the field.
+                    y:
+                      type: integer
+                      description: Y position of the field.
+                    height:
+                      type: integer
+                      description: Height of the field.
+                    width:
+                      type: integer
+                      description: Width of the field.
+                    flex_layout:
+                      type: boolean
+                      description: Whether the field uses flex layout.
+                    values:
+                      type: array
+                      maxItems: 10
+                      items:
+                        type: string
+                      description: Predefined values for the field (for dropdowns, etc.).
+                    default_value:
+                      type: string
+                      description: The default value for the field.
+                    enabled:
+                      type: boolean
+                      description: Whether the field is enabled.
+                    visible:
+                      type: boolean
+                      description: Whether the field is visible.
+                    mandatory:
+                      type: boolean
+                      description: Whether the field is required/mandatory.
+
+  /stations/overview:
+    get:
+      summary: Retrieves station overview
+      tags:
+        - Stations
+      description: >
+        Returns a comprehensive overview of all machines and their current dispatch data, including
+        operations and employee assignments, for a specific station.
+      parameters:
+        - name: id
+          in: query
+          description: Station ID to filter the overview
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Station overview with machine and operation details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  overview:
+                    type: object
+                    properties:
+                      ds_station_dash:
+                        type: object
+                        properties:
+                          machine:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                machine_id:
+                                  type: string
+                                res_desc:
+                                  type: string
+                                wrk_cntr_id:
+                                  type: string
+                                is_auto:
+                                  type: boolean
+                                is_trkd:
+                                  type: boolean
+                                machine_dispatch:
+                                  type: array
+                                  items:
+                                    type: object
+                                    properties:
+                                      part_id:
+                                        type: string
+                                      opr_qty:
+                                        type: integer
+                                      act_stat:
+                                        type: string
+                                      cust_req_dt:
+                                        type: string
+                                        format: date
+                                      schd_start_dt:
+                                        type: string
+                                        format: date-time
+                                      schd_ord_cmpl_dt:
+                                        type: string
+                                      schd_stop_dt:
+                                        type: string
+                                        format: date-time
+                                      prob_id:
+                                        type: string
+                                      opr_seq_no:
+                                        type: integer
+                                      ord_id:
+                                        type: string
+                                      schd_hrs:
+                                        type: number
+                                      is_org_res:
+                                        type: boolean
+                                      has_ord_rmk:
+                                        type: boolean
+                                      has_part_rmk:
+                                        type: boolean
+                                      part_desc:
+                                        type: string
+                                      wrk_ord_id:
+                                        type: string
+                                      operations:
+                                        type: array
+                                        items:
+                                          type: object
+                                          properties:
+                                            opr_seq_no:
+                                              type: integer
+                                            opr_desc:
+                                              type: string
+                                            act_stat:
+                                              type: string
+                                            plnd_qty:
+                                              type: integer
+                                            plnd_start_date:
+                                              type: string
+                                              format: date-time
+                                            schd_start_date:
+                                              type: string
+                                              format: date-time
+                                            act_start_date:
+                                              type: string
+                                              format: date-time
+                                              nullable: true
+                                            plnd_stop_date:
+                                              type: string
+                                              format: date-time
+                                            schd_stop_date:
+                                              type: string
+                                              format: date-time
+                                            act_cmpl_date:
+                                              type: string
+                                              format: date-time
+                                              nullable: true
+                                            qty_good:
+                                              type: integer
+                                            qty_scrap:
+                                              type: integer
+                                            queue_time:
+                                              type: integer
+                                            setup_time:
+                                              type: integer
+                                            run_time:
+                                              type: integer
+                                            idle_time:
+                                              type: integer
+                                            problem_time:
+                                              type: integer
+                                            tear_down_time:
+                                              type: integer
+                                            oee_avail:
+                                              type: number
+                                            oee_qual:
+                                              type: number
+                                            oee_perf:
+                                              type: number
+                                            oee_total:
+                                              type: number
+                                            eff_total:
+                                              type: number
+                                            problem_id:
+                                              type: string
+                                            schd_time:
+                                              type: number
+                                            pacing_machine_id:
+                                              type: string
+                                            std_setup_time:
+                                              type: number
+                                            std_tear_down_time:
+                                              type: number
+                                            pieces_per_hour:
+                                              type: number
+                                            hours_per_piece:
+                                              type: number
+                                            act_pieces_per_hour:
+                                              type: number
+                                            act_hours_per_piece:
+                                              type: number
+                                            work_order_id:
+                                              type: string
+                                            operation_employees:
+                                              type: array
+                                              items:
+                                                type: object
+                                                properties:
+                                                  emp_id:
+                                                    type: string
+                                                  stat_id:
+                                                    type: string
+                                                  stat_code:
+                                                    type: string
+                                                  start_datetime:
+                                                    type: string
+                                                    format: date-time
+                                                  is_lead:
+                                                    type: boolean
+                                                  act_prod_dt:
+                                                    type: string
+                                                    format: date
+                                                  rpt_shift_id:
+                                                    type: integer
+                                                  first_jobin_job:
+                                                    type: string
+                                                    format: date-time
+                                                    nullable: true
+                                                  first_jobin_shift:
+                                                    type: string
+                                                    format: date-time
+                                                    nullable: true
+                                                  first_jobin_job_and_shift:
+                                                    type: string
+                                                    format: date-time
+                                                    nullable: true
+                                                  employee:
+                                                    type: array
+                                                    items:
+                                                      type: object
+                                                      properties:
+                                                        emp_id:
+                                                          type: string
+                                                        full_name:
+                                                          type: string
+                                                        schd_shift_id:
+                                                          type: integer
+                                                        dept_id:
+                                                          type: string
+  /stations/resources:
+    get:
+      summary: Retrieves resources assigned to a station
+      tags:
+        - Stations
+      description: >
+        Returns all machine resources associated with a given station.
+        The `id` query parameter is required to specify which station to query.
+      parameters:
+        - name: id
+          in: query
+          description: Station ID used to filter the machines/resources
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of machines assigned to the station
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  machines:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        machine_id:
+                          type: string
+                          description: Unique machine identifier
+                          example: "787"
+                        res_desc:
+                          type: string
+                          description: Machine description
+                          example: "787"
+                        wrk_cntr_id:
+                          type: string
+                          description: Associated work center ID
+                          example: "787"
+                        is_auto:
+                          type: boolean
+                          description: Indicates if the machine is automated
+                          example: true
+                        is_trkd:
+                          type: boolean
+                          description: Indicates if the machine is being tracked
+                          example: false
+  /stations/settings:
+    get:
+      summary: Retrieves station-specific settings
+      tags:
+        - Stations
+      description: >
+        Returns configuration and label settings for a specific station.
+        This includes default codes and UI behavior flags for operational buttons.
+      parameters:
+        - name: id
+          in: query
+          description: Station ID used to retrieve its specific settings
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Station settings and UI configuration
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  settings:
+                    type: object
+                    properties:
+                      station_settings:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            default_setup_code:
+                              type: string
+                              example: ""
+                            default_prob_code:
+                              type: string
+                              example: ""
+                            default_scrap_code:
+                              type: string
+                              example: ""
+                            Batch_Label:
+                              type: string
+                              example: "LOC:"
+                            Lot_Label:
+                              type: string
+                              example: "LOT:"
+                            Serial_Label:
+                              type: string
+                              example: "REF:"
+                            planned_button_hidden:
+                              type: boolean
+                              example: true
+                            queue_button_hidden:
+                              type: boolean
+                              example: false
+                            setup_button_hidden:
+                              type: boolean
+                              example: true
+                            run_button_hidden:
+                              type: boolean
+                              example: false
+                            problem_button_hidden:
+                              type: boolean
+                              example: false
+                            complete_button_hidden:
+                              type: boolean
+                              example: false
+  /tasks:
+    get:
+      summary: Retrieves available tasks
+      tags:
+        - Tasks
+      description: >
+        Returns a list of predefined tasks that employees can be assigned to, including indirect labor
+        activities like meetings, cleanup, or training.
+      responses:
+        '200':
+          description: List of available tasks
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tasks:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        task_id:
+                          type: string
+                          description: Unique task identifier
+                          example: "Break"
+                        task_desc:
+                          type: string
+                          description: Task description
+                          example: "Break"
+  /tasks/employees:
+    get:
+      summary: Retrieves employees assigned to a task
+      tags:
+        - Tasks
+      description: >
+        Returns a list of employees assigned to a specific task, including department and station info.
+        Requires a `task_id` specified via the `id` query parameter.
+      parameters:
+        - name: id
+          in: query
+          description: Task ID used to filter employee assignments
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of employees working on the specified task
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  employees:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        emp_id:
+                          type: string
+                          description: Employee ID
+                          example: "0001"
+                        dept_id:
+                          type: string
+                          description: Department ID
+                          example: "9273"
+                        station_id:
+                          type: string
+                          description: Station Name
+                          example: "Layup"
+                        task_id:
+                          type: string
+                          description: Task Name
+                          example: "Break"
+                        start_datetime:
+                          type: string
+                          format: date-time
+                          description: Actual start date/time
+                          example: "2024-12-01T08:00:00.000"
+                        rpt_shift_id:
+                          type: integer
+                          description: Reported shift ID
+                          example: 1
+  /userlists:
+    get:
+      summary: Retrieves User lists
+      tags:
+        - Lists
+      description: Retrieves a user list based on the provided list ID.
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: string
+          description: The ID of the user list to retrieve.
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  usr_lists:
+                    type: object
+                    properties:
+                      user_lists:
+                        type: object
+                        properties:
+                          user_list:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                list_id:
+                                  type: string
+                                list_desc:
+                                  type: string
+                                list_items:
+                                  type: array
+                                  items:
+                                    type: object
+                                    properties:
+                                      list_grp:
+                                        type: string
+                                      list_item:
+                                        type: string
+                                      item_desc:
+                                        type: string
+    put:
+      summary: Add a user list
+      tags:
+        - Lists
+      description: Updates or adds a new user list configuration.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                list_id:
+                  type: string
+                list_desc:
+                  type: string
+                list_grp:
+                  type: string
+                list_item:
+                  type: string
+                item_desc:
+                  type: string
+                feild_one:
+                  type: string
+                feild_two:
+                  type: string
+                feild_three:
+                  type: string
+                feild_four:
+                  type: string
+                feild_five:
+                  type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  usr_list:
+                    type: object
+                    properties:
+                      list_id:
+                        type: string
+                      list_desc:
+                        type: string
+                      list_grp:
+                        type: string
+                      list_item:
+                        type: string
+                      item_desc:
+                        type: string
+                      feild_one:
+                        type: string
+                      feild_two:
+                        type: string
+                      feild_three:
+                        type: string
+                      feild_four:
+                        type: string
+                      feild_five:
+                        type: string
+                  transaction:
+                    type: object
+                    properties:
+                      complete:
+                        type: boolean
+                      details:
+                        type: string
+  /userlists/groups:
+    get:
+      summary: Retrieves a member of a user list
+      tags:
+        - Lists
+      description: Retrieves the user list group items for a given group ID and user list ID.
+      parameters:
+        - name: grp_id
+          in: query
+          required: true
+          schema:
+            type: string
+          description: The group ID to filter by.
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: string
+          description: The user list ID to filter by.
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  usr_list_grp:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        list_grp:
+                          type: string
+                        list_item:
+                          type: string
+                        item_desc:
+                          type: string
+  /workcenters:
+    get:
+      summary: Retrieves work centers
+      tags:
+        - Work Centers 
+      description: >
+        Returns a list of all available work centers in Factivity MES.
+        You can optionally filter by a specific work center ID using the `id` query parameter.
+      parameters:
+        - name: id
+          in: query
+          description: Filter by specific work center ID
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of work centers
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  work_centers:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        work_center_id:
+                          type: string
+                          description: Work center identifier
+                          example: "787"
+                        work_center_desc:
+                          type: string
+                          description: Description of the work center
+                          example: "787"
+                        calendar_id:
+                          type: string
+                          description: Associated calendar ID (if any)
+                          example: ""
+                        department_id:
+                          type: string
+                          description: Department to which the work center belongs
+                          example: "9273"
+tags:
+  # - name: Admin
+  #   description: Operations related to administration and development tasks.
+  - name: Alarms
+    description: Operations related to alarms.
+  - name: Codes
+    description: Operations related to codes.
+  - name: Customers
+    description: Operations related to customers.
+  - name: Departments
+    description: Operations related to departments.
+  - name: Documents
+    description: Operations related to documents.
+  - name: Employees
+    description: Operations related to employees.
+  # - name: Labels
+  #   description: Operations related to labels.
+  - name: Lists
+    description: Operations related to lists.
+  - name: Machine Monitor
+    description: Operations related to machines.
+  - name: Materials
+    description: Operations related to materials.
+  - name: Notes
+    description: Operations related to notes.
+  - name: OPC UA
+    description: Operations related to opc ua.
+  - name: Orders
+    description: Operations related to orders.
+  - name: Parts
+    description: Operations related to parts.
+  # - name: Program Controls
+  #   description: Operations related to program controls.
+  - name: Resources
+    description: Operations related to resources.
+  - name: Stations
+    description: Operations related to stations.
+  - name: Supervisor
+    description: Operations related to supervisor.
+  - name: System
+    description: Operations api connection and settings.
+  - name: Tasks
+    description: Operations related to tasks.
+  - name: Work Centers
+    description: Operations related to work centers.
+# - name: Incomplete
+#   description: Need to update
